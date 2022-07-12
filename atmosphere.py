@@ -258,7 +258,7 @@ class Atmosphere():
 
     def __init__(self, model=17, n_taylor=5, curved=True, zenith_numeric=np.deg2rad(83)):
         import sys
-        print "model is ", model
+        print("model is ", model)
         self.model = model
         self.curved = curved
         self.n_taylor = n_taylor
@@ -271,21 +271,21 @@ class Atmosphere():
         if curved:
             folder = os.path.dirname(os.path.abspath(__file__))
             filename = os.path.join(folder, "constants_%02i_%i.picke" % (self.model, n_taylor))
-            print "searching constants at ", filename
+            print("searching constants at ", filename)
             if os.path.exists(filename):
-                print "reading constants from ", filename
+                print("reading constants from ", filename)
                 fin = open(filename, "r")
                 self.a, self.d = pickle.load(fin)
                 fin.close()
                 if(len(self.a) != self.number_of_zeniths):
                     os.remove(filename)
-                    print "constants outdated, please rerun to calculate new constants"
+                    print("constants outdated, please rerun to calculate new constants")
                     sys.exit(0)
                 self.a_funcs = []
                 zeniths = np.arccos(np.linspace(0, 1, self.number_of_zeniths))
                 from scipy.interpolate import interp1d
                 mask = zeniths < np.deg2rad(83)
-                for i in xrange(5):
+                for i in range(5):
                     self.a_funcs.append(interp1d(zeniths[mask], self.a[..., i][mask], kind='cubic'))
             else:
                 # self.d = self.__calculate_d()
@@ -294,7 +294,7 @@ class Atmosphere():
                 fin = open(filename, "w")
                 pickle.dump([self.a, self.d], fin)
                 fin.close()
-                print "all constants calculated, exiting now... please rerun your analysis"
+                print("all constants calculated, exiting now... please rerun your analysis")
                 sys.exit(0)
 
     def __calculate_a(self,):
@@ -303,9 +303,9 @@ class Atmosphere():
         self.curved = True
         self.__zenith_numeric = 0
         for iZ, z in enumerate(zeniths):
-            print "calculating constants for %.02f deg zenith angle (iZ = %i, nT = %i)..." % (np.rad2deg(z), iZ, self.n_taylor)
+            print("calculating constants for %.02f deg zenith angle (iZ = %i, nT = %i)..." % (np.rad2deg(z), iZ, self.n_taylor))
             a[iZ] = self.__get_a(z)
-            print "\t... a  = ", a[iZ], " iZ = ", iZ
+            print("\t... a  = ", a[iZ], " iZ = ", iZ)
         return a
 
     def __get_a(self, zenith):
@@ -361,7 +361,7 @@ class Atmosphere():
                 tmp2 = -1. / 16. * st ** 2 * (ct ** 4 - 14 * ct ** 2 + 21) * (h / r_e) ** 5 / ct ** 11
                 dldh += tmp2
         else:
-            print "ERROR, height index our of bounds"
+            print("ERROR, height index our of bounds")
             import sys
             sys.exit(-1)
 
@@ -543,7 +543,7 @@ class Atmosphere():
 #             t_h_low = h_low[i]
 #             t_h_up = h_up[i]
             if t_h_up <= t_h_low:
-                print "WARNING _get_atmosphere_numeric(): upper limit less than lower limit"
+                print("WARNING _get_atmosphere_numeric(): upper limit less than lower limit")
                 return np.nan
             if t_h_up == np.infty:
                 t_h_up = h_max
@@ -630,12 +630,12 @@ class Atmosphere():
         mask_flat, mask_taylor, mask_numeric = self.__get_method_mask(zenith)
         tmp = np.zeros_like(zenith)
         if np.sum(mask_numeric):
-            print "get vertical height numeric", zenith
+            print("get vertical height numeric", zenith)
             tmp[mask_numeric] = self._get_vertical_height_numeric(*self.__get_arguments(mask_numeric, zenith, X))
         if np.sum(mask_taylor):
             tmp[mask_taylor] = self._get_vertical_height_numeric_taylor(*self.__get_arguments(mask_taylor, zenith, X))
         if np.sum(mask_flat):
-            print "get vertical height flat"
+            print("get vertical height flat")
             tmp[mask_flat] = self._get_vertical_height_flat(*self.__get_arguments(mask_flat, zenith, X))
         return tmp
 
@@ -646,7 +646,7 @@ class Atmosphere():
         self.__zenith_numeric = 0
         for iZ, z in enumerate(zeniths):
             z = np.array([z])
-            print "calculating constants for %.02f deg zenith angle (iZ = %i, nT = %i)..." % (np.rad2deg(z), iZ, self.n_taylor)
+            print("calculating constants for %.02f deg zenith angle (iZ = %i, nT = %i)..." % (np.rad2deg(z), iZ, self.n_taylor))
             d[iZ][0] = 0
             X1 = self._get_atmosphere(z, self.h[1])
             d[iZ][1] = self._get_vertical_height_numeric(z, X1) - self._get_vertical_height_taylor_wo_constants(z, X1)
@@ -654,7 +654,7 @@ class Atmosphere():
             d[iZ][2] = self._get_vertical_height_numeric(z, X2) - self._get_vertical_height_taylor_wo_constants(z, X2)
             X3 = self._get_atmosphere(z, self.h[3])
             d[iZ][3] = self._get_vertical_height_numeric(z, X3) - self._get_vertical_height_taylor_wo_constants(z, X3)
-            print "\t... d  = ", d[iZ], " iZ = ", iZ
+            print("\t... d  = ", d[iZ], " iZ = ", iZ)
         return d
 
     def _get_vertical_height_taylor(self, zenith, X):
@@ -664,9 +664,9 @@ class Atmosphere():
         for iX, mask in enumerate(masks):
             if(np.sum(mask)):
                 if iX < 4:
-                    print mask
-                    print tmp[mask], len(tmp[mask])
-                    print d[mask][..., iX]
+                    print(mask)
+                    print(tmp[mask], len(tmp[mask]))
+                    print(d[mask][..., iX])
                     tmp[mask] += d[mask][..., iX]
         return tmp
 
@@ -697,11 +697,11 @@ class Atmosphere():
                     if self.n_taylor >= 6:
                         tmp[mask] += -1. / (720. * r_e ** 5 * b[iX] ** 6) * c[iX] * (ct[mask] ** 6 * (945 * c[iX] ** 5 - 2205 * c[iX] ** 4 * r_e + 2380 * c[iX] ** 3 * r_e ** 2 - 1526 * c[iX] ** 2 * r_e ** 3 + 600 * c[iX] * r_e ** 4 - 120 * r_e ** 5) + ct[mask] ** 4 * (-1575 * c[iX] ** 5 + 3528 * c[iX] ** 4 * r_e - 3600 * c[iX] ** 3 * r_e ** 2 + 2074 * c[iX] ** 2 * r_e ** 3 - 600 * c[iX] * r_e ** 4) + ct[mask] ** 2 * (675 * c[iX] ** 5 - 1401 * c[iX] ** 4 * r_e - 1272 * c[iX] ** 3 * r_e ** 2 - 548 * c[iX] ** 2 * r_e ** 3) - 45 * c[iX] ** 5 + 78 * c[iX] ** 4 * r_e - 52 * c[iX] ** 3 * r_e ** 2) * xx ** 6
                 elif iX == 4:
-                    print "iX == 4", iX
+                    print("iX == 4", iX)
                     # numeric fallback
                     tmp[mask] = self._get_vertical_height_numeric(zenith, X)
                 else:
-                    print "iX > 4", iX
+                    print("iX > 4", iX)
                     tmp[mask] = np.ones_like(mask) * h_max
         return tmp
 
@@ -709,7 +709,7 @@ class Atmosphere():
         from scipy import optimize
         tmp = np.zeros_like(zenith)
         zenith = np.array(zenith)
-        for i in xrange(len(tmp)):
+        for i in range(len(tmp)):
 
             x0 = get_distance_for_height_above_ground(self._get_vertical_height_flat(zenith[i], X[i]), zenith[i])
 
@@ -729,7 +729,7 @@ class Atmosphere():
         from scipy import optimize
         tmp = np.zeros_like(zenith)
         zenith = np.array(zenith)
-        for i in xrange(len(tmp)):
+        for i in range(len(tmp)):
             if(X[i] < 0):
                 X[i] = 0
             x0 = get_distance_for_height_above_ground(self._get_vertical_height_flat(zenith[i], X[i]), zenith[i])
@@ -741,7 +741,7 @@ class Atmosphere():
                 dtmp = tmp - xmax
                 return dtmp
 
-            print zenith[i], X[i]
+            print(zenith[i], X[i])
 
             dxmax_geo = optimize.brentq(ftmp, -1e3, x0 + 1e4, xtol=1e-6,
                                         args=(zenith[i], X[i]))
@@ -760,7 +760,7 @@ class Atmosphere():
         """ returns the atmospheric density as a function of zenith angle
         and shower maximum Xmax """
         h = self._get_vertical_height(zenith, xmax)
-        print h
+        print(h)
         rho = get_density(h, model=self.model)
         return rho
 
@@ -877,13 +877,13 @@ class TestAtmosphericFunctions(unittest.TestCase):
         heights = np.linspace(0, 1e4, 10)
         atm1 = atm.get_atmosphere(zeniths, heights)
         atm2 = atm.get_atmosphere(np.zeros(10), heights) / np.cos(zeniths)
-        for i in xrange(len(atm1)):
+        for i in range(len(atm1)):
             self.assertAlmostEqual(atm1[i], atm2[i])
 
         heights2 = np.linspace(1e4, 1e5, 10)
         atm1 = atm.get_atmosphere(zeniths, heights, heights2)
         atm2 = atm.get_atmosphere(np.zeros(10), heights, heights2) / np.cos(zeniths)
-        for i in xrange(len(atm1)):
+        for i in range(len(atm1)):
             self.assertAlmostEqual(atm1[i], atm2[i])
 
         z = np.deg2rad(50)
@@ -901,19 +901,19 @@ class TestAtmosphericFunctions(unittest.TestCase):
         zeniths = np.deg2rad(np.linspace(0, 20, 3))
         atm1 = atm_flat.get_atmosphere(zeniths, 0)
         atm2 = atm_num.get_atmosphere(zeniths, 0)
-        for i in xrange(len(atm1)):
+        for i in range(len(atm1)):
             delta = 1e-3 + np.rad2deg(zeniths[i]) * 1e-2
             self.assertAlmostEqual(atm1[i], atm2[i], delta=delta)
 
         atm1 = atm_flat.get_atmosphere(zeniths, 1e3)
         atm2 = atm_num.get_atmosphere(zeniths, 1e3)
-        for i in xrange(len(atm1)):
+        for i in range(len(atm1)):
             delta = 1e-3 + np.rad2deg(zeniths[i]) * 1e-2
             self.assertAlmostEqual(atm1[i], atm2[i], delta=delta)
 
         atm1 = atm_flat.get_atmosphere(zeniths, 1e3, 1e4)
         atm2 = atm_num.get_atmosphere(zeniths, 1e3, 1e4)
-        for i in xrange(len(atm1)):
+        for i in range(len(atm1)):
             delta = 1e-3 + np.rad2deg(zeniths[i]) * 1e-2
             self.assertAlmostEqual(atm1[i], atm2[i], delta=delta)
 
@@ -936,7 +936,7 @@ class TestAtmosphericFunctions(unittest.TestCase):
             self.assertAlmostEqual(atm1, atm2, delta=1e-3)
 
         zeniths = np.deg2rad([0, 11.478341, 30.683417])
-        for i in xrange(len(zeniths)):
+        for i in range(len(zeniths)):
             delta = 1e-6
             atm1 = atm_taylor.get_atmosphere(zeniths[i], 0)
             atm2 = atm_num.get_atmosphere(zeniths[i], 0)
@@ -944,13 +944,13 @@ class TestAtmosphericFunctions(unittest.TestCase):
 
         atm1 = atm_taylor.get_atmosphere(zeniths, 1e3)
         atm2 = atm_num.get_atmosphere(zeniths, 1e3)
-        for i in xrange(len(atm1)):
+        for i in range(len(atm1)):
             delta = 1e-5
             self.assertAlmostEqual(atm1[i], atm2[i], delta=delta)
 
         atm1 = atm_taylor.get_atmosphere(zeniths, 1e3, 1e4)
         atm2 = atm_num.get_atmosphere(zeniths, 1e3, 1e4)
-        for i in xrange(len(atm1)):
+        for i in range(len(atm1)):
             delta = 1e-5
             self.assertAlmostEqual(atm1[i], atm2[i], delta=delta)
 
@@ -968,7 +968,7 @@ class TestAtmosphericFunctions(unittest.TestCase):
         atm_num = Atmosphere(curved=True, zenith_numeric=0)
 
         zeniths = np.deg2rad(np.linspace(0, 83, 20))
-        for i in xrange(len(zeniths)):
+        for i in range(len(zeniths)):
             delta = 1e-3
             # print "checking z = %.1f" % np.rad2deg(zeniths[i])
             atm1 = atm_taylor.get_atmosphere(zeniths[i], 0)
@@ -977,7 +977,7 @@ class TestAtmosphericFunctions(unittest.TestCase):
             self.assertAlmostEqual(atm1, atm2, delta=delta)
 
         zeniths = np.deg2rad(np.linspace(0, 83, 20))
-        for i in xrange(len(zeniths)):
+        for i in range(len(zeniths)):
             delta = 1e-2
             # print "checking z = %.1f" % np.rad2deg(zeniths[i])
             atm1 = atm_taylor.get_atmosphere(zeniths[i], 1e3)
@@ -985,7 +985,7 @@ class TestAtmosphericFunctions(unittest.TestCase):
             self.assertAlmostEqual(atm1, atm2, delta=delta)
 
         zeniths = np.deg2rad(np.linspace(0, 83, 20))
-        for i in xrange(len(zeniths)):
+        for i in range(len(zeniths)):
             delta = 1e-2
             # print "checking z = %.1f" % np.rad2deg(zeniths[i])
             atm1 = atm_taylor.get_atmosphere(zeniths[i], 0, 1e4)
@@ -999,14 +999,14 @@ class TestAtmosphericFunctions(unittest.TestCase):
         xmax = np.linspace(300, 900, 20)
         atm1 = atm_flat.get_vertical_height(zenith * np.ones_like(xmax), xmax)
         atm2 = atm_num.get_vertical_height(zenith * np.ones_like(xmax), xmax)
-        for i in xrange(len(xmax)):
+        for i in range(len(xmax)):
             self.assertAlmostEqual(atm1[i], atm2[i], delta=1e-2)
 
         zeniths = np.deg2rad(np.linspace(0, 30, 4))
         xmax = 600
         atm1 = atm_flat.get_vertical_height(zeniths, xmax)
         atm2 = atm_num.get_vertical_height(zeniths, xmax)
-        for i in xrange(len(zeniths)):
+        for i in range(len(zeniths)):
             self.assertAlmostEqual(atm1[i], atm2[i], delta=1e-3 * atm1[i])
 
     def test_vertical_height_taylor_numeric(self):
@@ -1017,7 +1017,7 @@ class TestAtmosphericFunctions(unittest.TestCase):
         xmax = 600
         atm1 = atm_taylor.get_vertical_height(zeniths, xmax)
         atm2 = atm_num.get_vertical_height(zeniths, xmax)
-        for i in xrange(len(zeniths)):
+        for i in range(len(zeniths)):
             # print "zenith = ", np.rad2deg(zeniths[i])
             self.assertAlmostEqual(atm1[i], atm2[i], delta=2e-5 * atm1[i])
 
@@ -1232,20 +1232,20 @@ if __name__ == "__main__":
         Dxmax = get_atmosphere2(zenith, h_low=0, h_up=h)
         full_atm = get_atmosphere2(zenith, h_low=0)
         xmax = full_atm - Dxmax
-        print "\tdxmax = %.2g, full_atm = %.2g, xmax = %.2g" % (Dxmax, full_atm, xmax)
+        print("\tdxmax = %.2g, full_atm = %.2g, xmax = %.2g" % (Dxmax, full_atm, xmax))
         dgeo2 = get_distance_xmax_geometric(xmax, zenith, observation_level=0, curved=True)
         h2 = get_height_above_ground(dgeo2, zenith)
-        print "dgeo 1 = %.2g, dgeo2 = %.2g, h1 = %.2g, h2 = %.2g" % (dgeo, dgeo2, h, h2)
+        print("dgeo 1 = %.2g, dgeo2 = %.2g, h1 = %.2g, h2 = %.2g" % (dgeo, dgeo2, h, h2))
 
     # #  some unit tests:
     heights = np.linspace(0, 1e5, 10)
     for h in heights:
         X = get_atmosphere2(zenith, h_low=h)
         h2 = get_vertical_height2(zenith, X, curved=True)
-        print "starting with height h = %.2g m -> X = %.2g g/cm^2  -> h = %.2g" % (h, X, h2)
+        print("starting with height h = %.2g m -> X = %.2g g/cm^2  -> h = %.2g" % (h, X, h2))
         dxmax_geo = get_distance_for_height_above_ground(h, zenith)
         dxmax_geo2 = get_distance_xmax_geometric(X, zenith, observation_level=0, curved=True)
-        print "\t dxmax geo 1 = %.2g, dxmaxgeo2 = %.2g" % (dxmax_geo, dxmax_geo2)
+        print("\t dxmax geo 1 = %.2g, dxmaxgeo2 = %.2g" % (dxmax_geo, dxmax_geo2))
     a = 1 / 0
 
     xmax = 669.
@@ -1265,8 +1265,8 @@ if __name__ == "__main__":
     fig.savefig("average_xmax_density_zenith.png")
     plt.show()
     a = 1 / 0
-    print "full atm 90"
-    print _get_full_atmosphere(np.deg2rad(90), 0)
+    print("full atm 90")
+    print(_get_full_atmosphere(np.deg2rad(90), 0))
     zeniths = np.deg2rad(np.arange(0, 90, 1))
     atm = np.zeros_like(zeniths)
     atm_curved = np.zeros_like(zeniths)

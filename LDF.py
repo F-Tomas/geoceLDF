@@ -7,7 +7,7 @@ import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-with open(os.path.join(dir_path, "pickle/geo_rcut_b_splines.pickle"), "r") as fin:
+with open(os.path.join(dir_path, "pickle/geo_rcut_b_splines.pkl"), "rb") as fin:
     spl_rcut_geo_params, spl_b_geo_params = pickle.load(fin)
     t, c, k = spl_rcut_geo_params
     t = np.append(np.append(np.ones(k) * t[0], t), np.ones(k) * t[-1])
@@ -17,7 +17,7 @@ with open(os.path.join(dir_path, "pickle/geo_rcut_b_splines.pickle"), "r") as fi
     t = np.append(np.append(np.ones(k) * t[0], t), np.ones(k) * t[-1])
     spl_b_geo = BSpline(t, c, k)
 
-with open(os.path.join(dir_path, "pickle/geo_sigmaR_spl.pickle"), "r") as fin:
+with open(os.path.join(dir_path, "pickle/geo_sigmaR_spl.pkl"), "rb") as fin:
     data = pickle.load(fin)
     t, c, k = data['geo_R_0m']
     t = np.append(np.append(np.ones(k) * t[0], t), np.ones(k) * t[-1])
@@ -36,7 +36,7 @@ with open(os.path.join(dir_path, "pickle/geo_sigmaR_spl.pickle"), "r") as fin:
     spl_geo_sigma_1564m = BSpline(t, c, k)
 
 
-with open(os.path.join(dir_path, "pickle/ce_sigma_spl.pickle"), "r") as fin:
+with open(os.path.join(dir_path, "pickle/ce_sigma_spl.pkl"), "rb") as fin:
     data = pickle.load(fin)
     t, c, k = data['ce_sigma_0m']
     t = np.append(np.append(np.ones(k) * t[0], t), np.ones(k) * t[-1])
@@ -49,7 +49,7 @@ with open(os.path.join(dir_path, "pickle/ce_sigma_spl.pickle"), "r") as fin:
 
 # read in spline parametrization of energy correction factors, i.e. the conversion from the
 # fit parameter E to the true radiation energy
-with open(os.path.join(dir_path, "pickle/Ecorr.pickle"), "r") as fin:
+with open(os.path.join(dir_path, "pickle/Ecorr.pkl"), "rb") as fin:
     data = pickle.load(fin)
 
     t, c, k = data['geo_Ecorr_1564m']
@@ -371,7 +371,7 @@ def get_p(r, rcut, p2):
     b = 1e-3 * p2
     p_geo = 2. * rcut ** b
     if np.sum(np.isinf(p_geo)):
-        print rcut, b, p_geo
+        print(rcut, b, p_geo)
     if((type(r) == np.float64) or (type(r) == np.float)):
         if(r <= rcut):
             return 2.
